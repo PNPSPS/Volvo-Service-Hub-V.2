@@ -31,11 +31,10 @@ const CUSTOMER_DB = [
 
 const INITIAL_JOBS = [
   { jobId: 'J001', customerId: 'c1', licensePlate: 'กท 9999', team: ['tech1', 'tech3'], currentStepId: 3, notes: [], specialStatus: null, totalEstimatedMinutes: 120, reqLounge: true, reqEV: true, healthReport: { battery: '98%', software: '2.14', brake: 'สมบูรณ์', diagNote: 'พบรอยขีดข่วนกันชนหน้าเล็กน้อย ลูกค้ารับทราบแล้ว' } },
-  { jobId: 'J002', customerId: 'c2', licensePlate: 'ขต 5555', team: ['tech2', 'tech4'], currentStepId: 2, notes: [], specialStatus: null, totalEstimatedMinutes: 90, reqLounge: false, reqEV: true, healthReport: { battery: '100%', software: '2.12', brake: 'ปกติ', diagNote: '' } }
 ];
 
 const INITIAL_HISTORY = [
-  { jobId: 'H001', customerId: 'c1', licensePlate: 'กท 9999', serviceName: 'เช็คระยะมาตรฐาน (10,000 km)', completedDate: '2025-11-20', totalMinutes: 65, team: ['tech1', 'tech3'], healthReport: { battery: '99%', software: '2.12', brake: 'สมบูรณ์', diagNote: 'ตรวจเช็คตามระยะเรียบร้อย' } },
+  { jobId: 'H001', customerId: 'c2', licensePlate: 'ขต 5555', serviceName: 'เช็คระยะมาตรฐาน (10,000 km)', completedDate: '2025-11-20', totalMinutes: 65, team: ['tech2', 'tech4'], healthReport: { battery: '99%', software: '2.12', brake: 'สมบูรณ์', diagNote: 'ตรวจเช็คตามระยะเรียบร้อย' } },
 ];
 
 const INITIAL_SERVICES = [
@@ -46,9 +45,12 @@ const INITIAL_SERVICES = [
   { id: 's5', name: 'วิเคราะห์ปัญหาระบบคอมพิวเตอร์ (VIDA)', estimatedMinutes: 60 },
 ];
 
+// เตรียมคิวจำลองล่วงหน้าสำหรับทดสอบ
+const tomorrowDate = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+
 const MOCK_BOOKINGS = [
   { id: 'b1', date: new Date().toISOString().split('T')[0], time: '10:00', licensePlate: 'ชจ 1122', customerName: 'คุณสมหญิง', phone: '082-123-4567', service: 'เช็คระยะชุดใหญ่ (20,000 km)', estimatedMinutes: 120, team: ['tech1', 'tech3'], reqLounge: true, reqEV: false },
-  { id: 'b2', date: new Date().toISOString().split('T')[0], time: '14:00', licensePlate: 'ฮฮ 5555', customerName: 'คุณประเสริฐ', phone: '081-987-6543', service: 'เปลี่ยนถ่ายน้ำมันเครื่องและไส้กรอง', estimatedMinutes: 45, team: [], reqLounge: false, reqEV: false },
+  { id: 'b2', date: tomorrowDate, time: '14:00', licensePlate: 'ขต 5555', customerName: 'คุณนภัสสร รุ่งเรือง', phone: '089-222-2222', service: 'เปลี่ยนถ่ายน้ำมันเครื่องและไส้กรอง', estimatedMinutes: 45, team: [], reqLounge: false, reqEV: true },
 ];
 
 const getMonthKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
@@ -89,6 +91,10 @@ export default function App() {
   const [staffMonthDate, setStaffMonthDate] = useState(new Date());
   const [staffSelectedDate, setStaffSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   
+  // State สำหรับจัดการแก้ไข/เลื่อนคิว (Staff Side)
+  const [editingBookingId, setEditingBookingId] = useState(null);
+  const [editBookingData, setEditBookingData] = useState({ date: '', time: '' });
+
   const [pendingAlerts, setPendingAlerts] = useState([]);
   
   const [pstMonthDate, setPstMonthDate] = useState(new Date());
@@ -182,6 +188,24 @@ export default function App() {
       }
       return j;
     }));
+  };
+
+  // ฟังก์ชันเลื่อน/ยกเลิกคิว (Staff Side)
+  const handleEditBookingStart = (b) => {
+    setEditingBookingId(b.id);
+    setEditBookingData({ date: b.date, time: b.time });
+  };
+
+  const handleEditBookingSave = (id) => {
+    setBookings(prev => prev.map(b => b.id === id ? { ...b, date: editBookingData.date, time: editBookingData.time } : b));
+    setEditingBookingId(null);
+  };
+
+  const handleCancelBooking = (id) => {
+    if(window.confirm('ยืนยันการยกเลิกคิวนี้ใช่หรือไม่? (ระบบจะลบข้อมูลคิวนี้ออกจากตารางทันที)')) {
+        setBookings(prev => prev.filter(b => b.id !== id));
+        setPendingAlerts(prev => prev.filter(a => a.id !== id));
+    }
   };
 
   const handleStartBooking = (bookingId) => {
@@ -376,8 +400,56 @@ export default function App() {
 
   const renderTracking = () => {
     const myJob = activeJobs.find(j => j.customerId === currentUser.id);
+    const myBookings = bookings.filter(b => b.licensePlate === currentUser.licensePlate);
 
     if (!myJob) {
+      if (myBookings.length > 0) {
+        return (
+          <div className="max-w-3xl mx-auto w-full space-y-6 animate-in fade-in duration-500 p-4 md:p-0">
+             <h2 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2"><CalendarDays className="text-blue-600"/> คิวรับบริการล่วงหน้าของคุณ</h2>
+             
+             {myBookings.map(b => (
+                 <div key={b.id} className="bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-slate-100 relative overflow-hidden mb-6">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-full -z-10"></div>
+                    <div className="flex justify-between items-start mb-6">
+                       <div>
+                          <p className="text-slate-500 text-sm mb-1">วันที่นัดหมาย (Date & Time)</p>
+                          <p className="text-2xl font-bold text-blue-600">{b.date}</p>
+                          <p className="text-lg font-semibold text-slate-700">เวลา {b.time} น.</p>
+                       </div>
+                       <div className="bg-blue-100 text-blue-600 p-4 rounded-2xl shadow-sm"><Clock size={28}/></div>
+                    </div>
+                    
+                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-6">
+                        <p className="text-sm font-bold text-slate-800 mb-2">รายละเอียดบริการ</p>
+                        <p className="text-sm text-slate-600">{b.service}</p>
+                        <div className="flex gap-2 mt-3">
+                            {b.reqLounge && <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded-md font-bold flex items-center gap-1"><Coffee size={12}/> VIP Lounge</span>}
+                            {b.reqEV && <span className="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded-md font-bold flex items-center gap-1"><Zap size={12}/> ชาร์จ EV</span>}
+                        </div>
+                    </div>
+                    
+                    <div className="flex flex-col sm:flex-row gap-3">
+                       <button onClick={() => {
+                           if(window.confirm('คุณต้องการยกเลิกคิวนี้ใช่หรือไม่? ระบบจะคืนสิทธิ์การจองให้ลูกค้ารายอื่นทันที')) {
+                               setBookings(prev => prev.filter(item => item.id !== b.id));
+                           }
+                       }} className="flex-1 py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-bold text-sm transition-colors border border-red-100 flex items-center justify-center gap-2">
+                           <X size={18}/> ยกเลิกคิวนัดหมาย (Cancel)
+                       </button>
+                    </div>
+                 </div>
+             ))}
+             
+             <div className="text-center mt-8">
+                 <button onClick={() => {setActiveTab('booking'); setBookingStep(1);}} className="text-blue-600 font-bold hover:underline text-sm flex items-center justify-center gap-1 mx-auto">
+                     <Plus size={16}/> จองคิวรับบริการเพิ่มเติม
+                 </button>
+             </div>
+          </div>
+        );
+      }
+
       return (
         <div className="flex flex-col items-center justify-center h-full text-center space-y-6 animate-in zoom-in duration-500 p-6">
           <div className="relative">
@@ -538,7 +610,7 @@ export default function App() {
            </div>
         )}
 
-        {/* Tracking Stepper Structure with precise line connections */}
+        {/* Tracking Stepper */}
         <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl border border-slate-100 relative overflow-hidden">
           <div className="flex justify-between items-center mb-8 relative z-10">
             <h2 className="text-xl font-bold text-slate-800">ขั้นตอนการบริการ</h2>
@@ -925,7 +997,7 @@ export default function App() {
   const renderStaffDashboard = () => {
     return (
       <div className="flex h-screen bg-[#020617] text-slate-300 font-sans">
-        <div className="w-64 bg-[#050B14] border-r border-slate-800 flex flex-col p-6">
+        <div className="w-64 bg-[#050B14] border-r border-slate-800 flex flex-col p-6 shrink-0">
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-white tracking-widest flex items-center gap-2">
               <Settings size={24} className="text-blue-500 animate-[spin_4s_linear_infinite]" /> STAFF
@@ -1079,7 +1151,6 @@ export default function App() {
                                 </div>
                               </div>
 
-                              {/* Real-time Vehicle Diagnosis Editor */}
                               {job.currentStepId >= 2 && job.healthReport && (
                                 <div className="bg-emerald-900/20 p-4 rounded-xl border border-emerald-900/50 mb-6 relative z-10">
                                    <p className="text-[10px] text-emerald-500 font-mono mb-3">VEHICLE_DIAGNOSIS (LIVE UPDATE TO CUSTOMER)</p>
@@ -1215,28 +1286,58 @@ export default function App() {
                          {bookings.filter(b => b.date === staffSelectedDate).length === 0 ? (
                              <p className="text-xs text-slate-600 font-mono text-center py-10">NO_DATA_FOUND</p>
                          ) : (
-                             bookings.filter(b => b.date === staffSelectedDate).map(b => (
-                                 <div key={b.id} className="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-col">
-                                     <div className="flex justify-between items-center mb-2">
-                                         <span className="text-blue-400 font-mono text-sm">{b.time}</span>
-                                         <span className="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-300">{b.licensePlate}</span>
+                             bookings.filter(b => b.date === staffSelectedDate).map(b => {
+                                 const isEditing = editingBookingId === b.id;
+                                 return (
+                                     <div key={b.id} className="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-col">
+                                         {isEditing ? (
+                                            <div className="space-y-3">
+                                                <div className="flex justify-between items-center mb-2">
+                                                   <span className="text-white text-sm font-bold flex items-center gap-2"><Edit3 size={14} className="text-blue-400"/> เลื่อนคิว (Reschedule)</span>
+                                                </div>
+                                                <div>
+                                                    <label className="text-[10px] text-slate-500 font-mono">NEW_DATE</label>
+                                                    <input type="date" value={editBookingData.date} onChange={e => setEditBookingData({...editBookingData, date: e.target.value})} className="w-full bg-slate-950 border border-slate-700 text-white text-xs p-2 rounded outline-none focus:border-blue-500" />
+                                                </div>
+                                                <div>
+                                                    <label className="text-[10px] text-slate-500 font-mono">NEW_TIME</label>
+                                                    <input type="time" value={editBookingData.time} onChange={e => setEditBookingData({...editBookingData, time: e.target.value})} className="w-full bg-slate-950 border border-slate-700 text-white text-xs p-2 rounded outline-none focus:border-blue-500" />
+                                                </div>
+                                                <div className="flex gap-2 mt-2">
+                                                    <button onClick={() => setEditingBookingId(null)} className="flex-1 py-2 bg-slate-800 text-slate-400 rounded-lg text-xs font-bold hover:bg-slate-700 transition-colors">ยกเลิก</button>
+                                                    <button onClick={() => handleEditBookingSave(b.id)} className="flex-1 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-500 transition-colors flex items-center justify-center gap-1"><Save size={12}/> บันทึก</button>
+                                                </div>
+                                            </div>
+                                         ) : (
+                                            <>
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <span className="text-blue-400 font-mono text-sm">{b.time}</span>
+                                                    <span className="text-xs bg-slate-800 px-2 py-0.5 rounded text-slate-300">{b.licensePlate}</span>
+                                                </div>
+                                                <p className="font-bold text-white text-sm mb-1">{b.customerName}</p>
+                                                <p className="text-[10px] text-slate-500 font-mono mb-2">{b.phone}</p>
+                                                <p className="text-xs text-emerald-400 bg-emerald-900/20 px-2 py-1 rounded inline-block w-fit mb-3">{b.service}</p>
+                                                
+                                                {(b.reqLounge || b.reqEV) && (
+                                                   <div className="flex gap-2 mb-3">
+                                                     {b.reqLounge && <span className="text-[10px] bg-amber-900/30 text-amber-400 px-2 py-0.5 rounded flex items-center gap-1 border border-amber-900/50"><Coffee size={10}/> LOUNGE</span>}
+                                                     {b.reqEV && <span className="text-[10px] bg-emerald-900/30 text-emerald-400 px-2 py-0.5 rounded flex items-center gap-1 border border-emerald-900/50"><Zap size={10}/> EV</span>}
+                                                   </div>
+                                                )}
+
+                                                <div className="flex gap-2 mt-auto mb-2">
+                                                    <button onClick={() => handleEditBookingStart(b)} className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 rounded-lg text-xs font-mono transition-colors flex items-center justify-center gap-1 border border-slate-700"><Edit3 size={12}/> เลื่อนคิว</button>
+                                                    <button onClick={() => handleCancelBooking(b.id)} className="flex-1 bg-red-900/20 hover:bg-red-900/40 text-red-400 py-2 rounded-lg text-xs font-mono transition-colors flex items-center justify-center gap-1 border border-red-900/50"><X size={12}/> ยกเลิกคิว</button>
+                                                </div>
+                                                
+                                                <button onClick={() => handleStartBooking(b.id)} className="w-full bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-800 hover:border-blue-500 py-2 rounded-lg text-xs font-mono transition-colors flex items-center justify-center gap-2">
+                                                    <Car size={14} /> รับรถเข้าศูนย์ (DROP-OFF)
+                                                </button>
+                                            </>
+                                         )}
                                      </div>
-                                     <p className="font-bold text-white text-sm mb-1">{b.customerName}</p>
-                                     <p className="text-[10px] text-slate-500 font-mono mb-2">{b.phone}</p>
-                                     <p className="text-xs text-emerald-400 bg-emerald-900/20 px-2 py-1 rounded inline-block w-fit mb-3">{b.service}</p>
-                                     
-                                     {(b.reqLounge || b.reqEV) && (
-                                        <div className="flex gap-2 mb-3">
-                                          {b.reqLounge && <span className="text-[10px] bg-amber-900/30 text-amber-400 px-2 py-0.5 rounded flex items-center gap-1 border border-amber-900/50"><Coffee size={10}/> LOUNGE</span>}
-                                          {b.reqEV && <span className="text-[10px] bg-emerald-900/30 text-emerald-400 px-2 py-0.5 rounded flex items-center gap-1 border border-emerald-900/50"><Zap size={10}/> EV</span>}
-                                        </div>
-                                     )}
-                                     
-                                     <button onClick={() => handleStartBooking(b.id)} className="mt-auto w-full bg-blue-600/20 hover:bg-blue-600 text-blue-400 hover:text-white border border-blue-800 hover:border-blue-500 py-2 rounded-lg text-xs font-mono transition-colors flex items-center justify-center gap-2">
-                                         <Car size={14} /> รับรถเข้าศูนย์ (DROP-OFF)
-                                     </button>
-                                 </div>
-                             ))
+                                 )
+                             })
                          )}
                      </div>
                   </div>
