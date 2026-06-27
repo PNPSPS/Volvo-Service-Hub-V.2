@@ -5,7 +5,7 @@ import {
   ShieldCheck, AlertCircle, CalendarDays, Star, LogOut,
   UserPlus, Bell, ChevronLeft, Info, Settings, ArrowRight,
   Eye, EyeOff, Cpu, BatteryCharging, Plus, Trash2,
-  Coffee, Zap, Activity, Check, Users, History, Edit3, Save, X
+  Coffee, Zap, Activity, Check, Users, History, Edit3, Save, X, Megaphone, Tag
 } from 'lucide-react';
 
 const INITIAL_SERVICE_STEPS = [
@@ -25,8 +25,8 @@ const INITIAL_STAFF = [
 ];
 
 const CUSTOMER_DB = [
-  { id: 'c1', name: 'คุณสมเกียรติ ใจดี', phone: '081-111-1111', email: 'somkiat@volvo.com', lineId: '@somkiat_v', licensePlate: 'กท 9999', model: 'XC60 Recharge', vin: 'YV1DZ...', nextServiceKm: 20000, nextServiceDays: 30 },
-  { id: 'c2', name: 'คุณนภัสสร รุ่งเรือง', phone: '089-222-2222', email: 'napat@volvo.com', lineId: '@napat.r', licensePlate: 'ขต 5555', model: 'EX30', vin: 'YV1EX...', nextServiceKm: 15000, nextServiceDays: 180 }
+  { id: 'c1', name: 'คุณสมเกียรติ ใจดี', phone: '081-111-1111', email: 'somkiat@volvo.com', lineId: '@somkiat_v', licensePlate: 'กท 9999', model: 'XC60 Recharge', vin: 'YV1DZ...', nextServiceKm: 20000, nextServiceDays: 30, joinedDate: '2025-10-15' },
+  { id: 'c2', name: 'คุณนภัสสร รุ่งเรือง', phone: '089-222-2222', email: 'napat@volvo.com', lineId: '@napat.r', licensePlate: 'ขต 5555', model: 'EX30', vin: 'YV1EX...', nextServiceKm: 15000, nextServiceDays: 180, joinedDate: '2025-11-20' }
 ];
 
 const INITIAL_JOBS = [
@@ -35,6 +35,11 @@ const INITIAL_JOBS = [
 
 const INITIAL_HISTORY = [
   { jobId: 'H001', customerId: 'c2', licensePlate: 'ขต 5555', serviceName: 'เช็คระยะมาตรฐาน (10,000 km)', completedDate: '2025-11-20', totalMinutes: 65, team: ['tech2', 'tech4'], healthReport: { battery: '99%', software: '2.12', brake: 'สมบูรณ์', diagNote: 'ตรวจเช็คตามระยะเรียบร้อย' } },
+];
+
+const INITIAL_NEWS = [
+  { id: 'n1', title: 'แคมเปญตรวจเช็คสภาพรถฟรี 24 รายการ', content: 'เตรียมความพร้อมก่อนเดินทางช่วงเทศกาล เข้ามารับบริการตรวจเช็คระบบเบรก แบตเตอรี่ และของเหลวฟรี ได้ตั้งแต่วันนี้ - 30 ก.ค. 26', image: 'https://images.unsplash.com/photo-1619682817481-e994891cd1f5?auto=format&fit=crop&q=80&w=800', date: '2026-06-01', type: 'promo', active: true },
+  { id: 'n2', title: 'ปัญหาที่พบบ่อย: การเชื่อมต่อ Apple CarPlay', content: 'หากลูกค้าพบปัญหาเชื่อมต่อไม่ได้ แนะนำให้ทำการรีสตาร์ทหน้าจอกลางโดยการกดปุ่มโฮมค้างไว้ 20 วินาที หากยังไม่หายสามารถติดต่อศูนย์บริการได้เลยครับ', image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&q=80&w=800', date: '2026-06-15', type: 'info', active: true }
 ];
 
 const INITIAL_SERVICES = [
@@ -109,6 +114,15 @@ export default function App() {
   const [progressAngle, setProgressAngle] = useState(0);
   const [newServiceName, setNewServiceName] = useState('');
   const [newServiceTime, setNewServiceTime] = useState(60);
+
+  const [newsList, setNewsList] = useState(INITIAL_NEWS);
+  const [newsForm, setNewsForm] = useState({ title: '', content: '', image: '', type: 'promo' });
+
+  // States สำหรับระบบตัวกรอง วัน/เดือน/ปี (Admin Filters)
+  const [historyFilterType, setHistoryFilterType] = useState('all');
+  const [historyFilterValue, setHistoryFilterValue] = useState('');
+  const [crmFilterType, setCrmFilterType] = useState('all');
+  const [crmFilterValue, setCrmFilterValue] = useState('');
   const [showContactModal, setShowContactModal] = useState(false);
 
   useEffect(() => {
@@ -148,7 +162,7 @@ export default function App() {
 
   const handleRegister = (e) => {
     e.preventDefault();
-    const newCustomer = { id: `c${customers.length + 1}`, ...regForm, nextServiceKm: 10000, nextServiceDays: 180 };
+    const newCustomer = { id: `c${customers.length + 1}`, ...regForm, nextServiceKm: 10000, nextServiceDays: 180, joinedDate: new Date().toISOString().split('T')[0] };
     setCustomers([...customers, newCustomer]);
     setCurrentUser(newCustomer);
     setAuthMode('app');
@@ -216,7 +230,7 @@ export default function App() {
     if (!customer) {
       customer = {
         id: `c${Date.now()}`, name: booking.customerName, phone: booking.phone, email: 'dropoff@volvo.com', 
-        lineId: '-', licensePlate: booking.licensePlate, model: 'Volvo (Walk-in/Drop)', vin: '-', nextServiceKm: 10000, nextServiceDays: 180
+        lineId: '-', licensePlate: booking.licensePlate, model: 'Volvo (Walk-in/Drop)', vin: '-', nextServiceKm: 10000, nextServiceDays: 180, joinedDate: new Date().toISOString().split('T')[0]
       };
       setCustomers(prev => [...prev, customer]);
     }
@@ -995,6 +1009,23 @@ export default function App() {
   };
 
   const renderStaffDashboard = () => {
+    // ระบบคำนวณตัวกรองประวัติซ่อมบำรุง
+    const filteredHistory = jobHistory.filter(h => {
+        if (historyFilterType === 'all' || !historyFilterValue) return true;
+        if (historyFilterType === 'month' || historyFilterType === 'year') return h.completedDate.startsWith(historyFilterValue);
+        if (historyFilterType === 'date') return h.completedDate === historyFilterValue;
+        return true;
+    });
+
+    // ระบบคำนวณตัวกรองฐานข้อมูลลูกค้า
+    const filteredCustomers = customers.filter(c => {
+        if (crmFilterType === 'all' || !crmFilterValue) return true;
+        const dateStr = c.joinedDate || '';
+        if (crmFilterType === 'month' || crmFilterType === 'year') return dateStr.startsWith(crmFilterValue);
+        if (crmFilterType === 'date') return dateStr === crmFilterValue;
+        return true;
+    });
+
     return (
       <div className="flex h-screen bg-[#020617] text-slate-300 font-sans">
         <div className="w-64 bg-[#050B14] border-r border-slate-800 flex flex-col p-6 shrink-0">
@@ -1036,6 +1067,9 @@ export default function App() {
                 </button>
                 <button onClick={() => setStaffTab('services')} className={`w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors ${staffTab === 'services' ? 'bg-blue-900/40 text-blue-400 border border-blue-900' : 'hover:bg-slate-900'}`}>
                    <Clock size={18} /> SERVICE_CONFIG
+                </button>
+                <button onClick={() => setStaffTab('news')} className={`w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors ${staffTab === 'news' ? 'bg-blue-900/40 text-blue-400 border border-blue-900' : 'hover:bg-slate-900'}`}>
+                   <Megaphone size={18} /> NEWS_&_PROMO
                 </button>
                 <button onClick={() => setStaffTab('staff')} className={`w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors mt-8 border ${staffTab === 'staff' ? 'bg-emerald-900/40 text-emerald-400 border-emerald-900' : 'border-slate-800 hover:bg-slate-900'}`}>
                    <User size={18} /> STAFF_ACCESS
@@ -1201,12 +1235,27 @@ export default function App() {
 
            {staffTab === 'history' && (
               <div className="max-w-6xl mx-auto space-y-6">
-                 <div className="flex justify-between items-end mb-8 border-b border-slate-800 pb-4">
+                 <div className="flex justify-between items-end mb-4 border-b border-slate-800 pb-4">
                     <div>
                       <h1 className="text-3xl font-bold text-white tracking-wide">SERVICE_HISTORY</h1>
-                      <p className="text-slate-500 font-mono mt-2">ประวัติงานซ่อมบำรุงและส่งมอบรถยนต์เรียบร้อยแล้ว ({jobHistory.length} RECORDS)</p>
+                      <p className="text-slate-500 font-mono mt-2">ประวัติงานซ่อมบำรุงและส่งมอบรถยนต์เรียบร้อยแล้ว ({filteredHistory.length} RECORDS)</p>
                     </div>
                  </div>
+
+                 {/* แถบตัวกรอง (Filter UI) สำหรับ History */}
+                 <div className="flex flex-col sm:flex-row gap-4 mb-6 bg-slate-900/50 p-4 rounded-xl border border-slate-800 items-center">
+                    <span className="text-slate-400 font-mono text-sm flex items-center gap-2"><CalendarDays size={16}/> FILTER_BY:</span>
+                    <select value={historyFilterType} onChange={e => { setHistoryFilterType(e.target.value); setHistoryFilterValue(''); }} className="bg-slate-950 border border-slate-700 text-white text-sm rounded-lg px-3 py-2 outline-none focus:border-blue-500 font-mono">
+                        <option value="all">ทั้งหมด (ALL)</option>
+                        <option value="date">ระบุวันที่ (DATE)</option>
+                        <option value="month">ระบุเดือน (MONTH)</option>
+                        <option value="year">ระบุปี (YEAR)</option>
+                    </select>
+                    {historyFilterType === 'date' && <input type="date" value={historyFilterValue} onChange={e => setHistoryFilterValue(e.target.value)} className="bg-slate-950 border border-slate-700 text-white text-sm rounded-lg px-3 py-2 outline-none focus:border-blue-500 font-mono" />}
+                    {historyFilterType === 'month' && <input type="month" value={historyFilterValue} onChange={e => setHistoryFilterValue(e.target.value)} className="bg-slate-950 border border-slate-700 text-white text-sm rounded-lg px-3 py-2 outline-none focus:border-blue-500 font-mono" />}
+                    {historyFilterType === 'year' && <input type="number" placeholder="YYYY (เช่น 2026)" value={historyFilterValue} onChange={e => setHistoryFilterValue(e.target.value)} className="w-32 bg-slate-950 border border-slate-700 text-white text-sm rounded-lg px-3 py-2 outline-none focus:border-blue-500 font-mono text-center" />}
+                 </div>
+
                  <div className="bg-[#050B14] rounded-2xl border border-slate-800 shadow-2xl overflow-x-auto">
                     <table className="w-full text-left text-sm text-slate-400 whitespace-nowrap">
                        <thead className="bg-slate-900 text-xs uppercase font-mono text-slate-500">
@@ -1218,33 +1267,37 @@ export default function App() {
                           </tr>
                        </thead>
                        <tbody className="divide-y divide-slate-800">
-                          {jobHistory.map(h => {
-                              const customer = customers.find(c => c.id === h.customerId);
-                              return (
-                                 <tr key={h.jobId} className="hover:bg-slate-900/50 transition-colors">
-                                    <td className="px-6 py-4 font-mono">
-                                       <p className="text-emerald-400 font-bold">{h.jobId}</p>
-                                       <p className="text-slate-500 text-xs mt-1">{h.completedDate}</p>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                       <p className="text-white font-bold">{h.licensePlate}</p>
-                                       <p className="text-slate-500 text-xs mt-1">{customer?.name}</p>
-                                    </td>
-                                    <td className="px-6 py-4 text-xs text-blue-300">
-                                       {h.serviceName}
-                                    </td>
-                                    <td className="px-6 py-4">
-                                       <div className="flex -space-x-2">
-                                          {h.team.map(techId => {
-                                              const t = staffList.find(x => x.id === techId);
-                                              if(!t) return null;
-                                              return <img key={t.id} src={t.img} title={t.name} className="w-8 h-8 rounded-full border-2 border-slate-800 object-cover relative" />
-                                          })}
-                                       </div>
-                                    </td>
-                                 </tr>
-                              )
-                          })}
+                          {filteredHistory.length === 0 ? (
+                              <tr><td colSpan="4" className="text-center py-10 text-slate-600 font-mono">NO_DATA_MATCHING_FILTER</td></tr>
+                          ) : (
+                             filteredHistory.map(h => {
+                                 const customer = customers.find(c => c.id === h.customerId);
+                                 return (
+                                    <tr key={h.jobId} className="hover:bg-slate-900/50 transition-colors">
+                                       <td className="px-6 py-4 font-mono">
+                                          <p className="text-emerald-400 font-bold">{h.jobId}</p>
+                                          <p className="text-slate-500 text-xs mt-1">{h.completedDate}</p>
+                                       </td>
+                                       <td className="px-6 py-4">
+                                          <p className="text-white font-bold">{h.licensePlate}</p>
+                                          <p className="text-slate-500 text-xs mt-1">{customer?.name}</p>
+                                       </td>
+                                       <td className="px-6 py-4 text-xs text-blue-300">
+                                          {h.serviceName}
+                                       </td>
+                                       <td className="px-6 py-4">
+                                          <div className="flex -space-x-2">
+                                             {h.team.map(techId => {
+                                                 const t = staffList.find(x => x.id === techId);
+                                                 if(!t) return null;
+                                                 return <img key={t.id} src={t.img} title={t.name} className="w-8 h-8 rounded-full border-2 border-slate-800 object-cover relative" />
+                                             })}
+                                          </div>
+                                       </td>
+                                    </tr>
+                                 )
+                             })
+                          )}
                        </tbody>
                     </table>
                  </div>
@@ -1425,14 +1478,97 @@ export default function App() {
               </div>
            )}
 
-           {staffTab === 'crm' && (
-              <div className="max-w-6xl mx-auto space-y-6">
+           {staffTab === 'news' && (
+              <div className="max-w-5xl mx-auto space-y-6">
                  <div className="flex justify-between items-end mb-8 border-b border-slate-800 pb-4">
                     <div>
-                      <h1 className="text-3xl font-bold text-white tracking-wide">CUSTOMER_DATABASE</h1>
-                      <p className="text-slate-500 font-mono mt-2">TOTAL RECORDS: {customers.length}</p>
+                      <h1 className="text-3xl font-bold text-white tracking-wide">NEWS & PROMOTION</h1>
+                      <p className="text-slate-500 font-mono mt-2">จัดการข่าวสาร แคมเปญส่วนลด และให้คำแนะนำปัญหาที่พบบ่อยสำหรับลูกค้า</p>
                     </div>
                  </div>
+
+                 {/* Add Form */}
+                 <div className="bg-[#050B14] rounded-2xl p-6 border border-blue-900/50 shadow-2xl mb-8 border-dashed">
+                    <h3 className="text-blue-400 font-mono text-sm mb-4">CREATE_NEW_ANNOUNCEMENT</h3>
+                    <div className="space-y-4">
+                       <div className="flex flex-col md:flex-row gap-4">
+                           <select value={newsForm.type} onChange={e => setNewsForm({...newsForm, type: e.target.value})} className="bg-slate-900 border border-slate-700 text-white rounded-lg px-4 py-3 outline-none focus:border-blue-500 font-mono w-full md:w-48">
+                               <option value="promo">โปรโมชั่น/แคมเปญ (PROMO)</option>
+                               <option value="info">ปัญหาที่พบบ่อย/ข้อมูล (INFO)</option>
+                           </select>
+                           <input type="text" placeholder="หัวข้อข่าวสาร..." value={newsForm.title} onChange={e => setNewsForm({...newsForm, title: e.target.value})} className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:border-blue-500 outline-none" />
+                       </div>
+                       <div className="flex gap-4">
+                           <input type="text" placeholder="ลิงก์รูปภาพ (Image URL) *เว้นว่างได้" value={newsForm.image} onChange={e => setNewsForm({...newsForm, image: e.target.value})} className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-slate-300 focus:border-blue-500 outline-none font-mono text-sm" />
+                       </div>
+                       <div className="flex flex-col md:flex-row gap-4 items-start">
+                           <textarea placeholder="รายละเอียด หรือวิธีการแก้ไขปัญหา..." value={newsForm.content} onChange={e => setNewsForm({...newsForm, content: e.target.value})} rows="3" className="flex-1 w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:border-blue-500 outline-none resize-none" />
+                           <button onClick={() => {
+                               if(newsForm.title && newsForm.content) {
+                                   setNewsList(prev => [{id: `n${Date.now()}`, title: newsForm.title, content: newsForm.content, image: newsForm.image, type: newsForm.type, date: new Date().toISOString().split('T')[0], active: true}, ...prev]);
+                                   setNewsForm({title: '', content: '', image: '', type: 'promo'});
+                               }
+                           }} className="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-lg font-bold transition-colors flex items-center justify-center gap-2 font-mono h-[88px]">
+                               <Plus size={18} /> POST
+                           </button>
+                       </div>
+                    </div>
+                 </div>
+
+                 {/* News List */}
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                     {newsList.map(n => (
+                         <div key={n.id} className={`bg-slate-900 p-6 rounded-2xl border transition-colors relative flex flex-col ${n.active ? (n.type === 'promo' ? 'border-amber-900/50' : 'border-blue-900/50') : 'border-slate-800 opacity-50 grayscale'}`}>
+                             <div className="flex justify-between items-start mb-4">
+                                 <div className="flex items-center gap-2">
+                                     {n.type === 'promo' ? <Tag size={16} className="text-amber-400"/> : <Info size={16} className="text-blue-400"/>}
+                                     <span className={`text-[10px] font-bold px-2 py-1 rounded font-mono ${n.type === 'promo' ? 'bg-amber-900/30 text-amber-400' : 'bg-blue-900/30 text-blue-400'}`}>{n.type === 'promo' ? 'PROMO' : 'INFO'}</span>
+                                     <span className="text-[10px] text-slate-500 font-mono">{n.date}</span>
+                                 </div>
+                                 <button onClick={() => setNewsList(prev => prev.filter(x => x.id !== n.id))} className="text-slate-600 hover:text-red-400 transition-colors"><Trash2 size={16}/></button>
+                             </div>
+                             
+                             {n.image && (
+                                 <img src={n.image} alt="" className="w-full h-40 object-cover rounded-xl mb-4 border border-slate-800" />
+                             )}
+                             
+                             <h4 className="text-white font-bold text-lg mb-2">{n.title}</h4>
+                             <p className="text-slate-400 text-sm mb-12 line-clamp-3">{n.content}</p>
+                             
+                             <div className="absolute bottom-6 right-6 mt-auto">
+                                 <button onClick={() => setNewsList(prev => prev.map(x => x.id === n.id ? {...x, active: !x.active} : x))} className={`text-[10px] font-bold font-mono px-3 py-1.5 rounded border transition-colors ${n.active ? 'border-emerald-500/50 text-emerald-400 bg-emerald-900/20 hover:bg-emerald-900/40' : 'border-slate-600 text-slate-400 bg-slate-800 hover:bg-slate-700'}`}>
+                                     {n.active ? 'STATUS: ACTIVE' : 'STATUS: HIDDEN'}
+                                 </button>
+                             </div>
+                         </div>
+                     ))}
+                 </div>
+              </div>
+           )}
+
+           {staffTab === 'crm' && (
+              <div className="max-w-6xl mx-auto space-y-6">
+                 <div className="flex justify-between items-end mb-4 border-b border-slate-800 pb-4">
+                    <div>
+                      <h1 className="text-3xl font-bold text-white tracking-wide">CUSTOMER_DATABASE</h1>
+                      <p className="text-slate-500 font-mono mt-2">TOTAL RECORDS: {filteredCustomers.length}</p>
+                    </div>
+                 </div>
+
+                 {/* แถบตัวกรอง (Filter UI) สำหรับ CRM */}
+                 <div className="flex flex-col sm:flex-row gap-4 mb-6 bg-slate-900/50 p-4 rounded-xl border border-slate-800 items-center">
+                    <span className="text-slate-400 font-mono text-sm flex items-center gap-2"><CalendarDays size={16}/> FILTER_JOINED_DATE:</span>
+                    <select value={crmFilterType} onChange={e => { setCrmFilterType(e.target.value); setCrmFilterValue(''); }} className="bg-slate-950 border border-slate-700 text-white text-sm rounded-lg px-3 py-2 outline-none focus:border-blue-500 font-mono">
+                        <option value="all">ทั้งหมด (ALL)</option>
+                        <option value="date">ระบุวันที่ (DATE)</option>
+                        <option value="month">ระบุเดือน (MONTH)</option>
+                        <option value="year">ระบุปี (YEAR)</option>
+                    </select>
+                    {crmFilterType === 'date' && <input type="date" value={crmFilterValue} onChange={e => setCrmFilterValue(e.target.value)} className="bg-slate-950 border border-slate-700 text-white text-sm rounded-lg px-3 py-2 outline-none focus:border-blue-500 font-mono" />}
+                    {crmFilterType === 'month' && <input type="month" value={crmFilterValue} onChange={e => setCrmFilterValue(e.target.value)} className="bg-slate-950 border border-slate-700 text-white text-sm rounded-lg px-3 py-2 outline-none focus:border-blue-500 font-mono" />}
+                    {crmFilterType === 'year' && <input type="number" placeholder="YYYY (เช่น 2026)" value={crmFilterValue} onChange={e => setCrmFilterValue(e.target.value)} className="w-32 bg-slate-950 border border-slate-700 text-white text-sm rounded-lg px-3 py-2 outline-none focus:border-blue-500 font-mono text-center" />}
+                 </div>
+
                  <div className="bg-[#050B14] rounded-2xl border border-slate-800 shadow-2xl overflow-x-auto">
                     <table className="w-full text-left text-sm text-slate-400 whitespace-nowrap">
                        <thead className="bg-slate-900 text-xs uppercase font-mono text-slate-500">
@@ -1441,26 +1577,34 @@ export default function App() {
                              <th className="px-6 py-5">ข้อมูลติดต่อ</th>
                              <th className="px-6 py-5">เลขตัวถัง (VIN)</th>
                              <th className="px-6 py-5 text-right">เช็คระยะถัดไป</th>
+                             <th className="px-6 py-5 text-right">วันที่ลงทะเบียน</th>
                           </tr>
                        </thead>
                        <tbody className="divide-y divide-slate-800">
-                          {customers.map(c => (
-                             <tr key={c.id} className="hover:bg-slate-900/50 transition-colors">
-                                <td className="px-6 py-4">
-                                   <p className="text-white font-bold">{c.name}</p>
-                                   <p className="text-blue-400 font-mono mt-1">{c.licensePlate} <span className="text-slate-500 ml-1">({c.model})</span></p>
-                                </td>
-                                <td className="px-6 py-4 font-mono">
-                                   <p className="text-slate-300 flex items-center gap-2"><Phone size={12}/> {c.phone}</p>
-                                   <p className="text-emerald-400 mt-1 flex items-center gap-2"><MessageCircle size={12}/> {c.lineId}</p>
-                                </td>
-                                <td className="px-6 py-4 font-mono text-xs text-slate-500 uppercase">{c.vin}</td>
-                                <td className="px-6 py-4 text-right font-mono">
-                                   <p className="text-white font-bold">{c.nextServiceKm.toLocaleString()} KM</p>
-                                   <p className="text-slate-500 text-xs mt-1">in {c.nextServiceDays} Days</p>
-                                </td>
-                             </tr>
-                          ))}
+                          {filteredCustomers.length === 0 ? (
+                              <tr><td colSpan="5" className="text-center py-10 text-slate-600 font-mono">NO_DATA_MATCHING_FILTER</td></tr>
+                          ) : (
+                             filteredCustomers.map(c => (
+                                <tr key={c.id} className="hover:bg-slate-900/50 transition-colors">
+                                   <td className="px-6 py-4">
+                                      <p className="text-white font-bold">{c.name}</p>
+                                      <p className="text-blue-400 font-mono mt-1">{c.licensePlate} <span className="text-slate-500 ml-1">({c.model})</span></p>
+                                   </td>
+                                   <td className="px-6 py-4 font-mono">
+                                      <p className="text-slate-300 flex items-center gap-2"><Phone size={12}/> {c.phone}</p>
+                                      <p className="text-emerald-400 mt-1 flex items-center gap-2"><MessageCircle size={12}/> {c.lineId}</p>
+                                   </td>
+                                   <td className="px-6 py-4 font-mono text-xs text-slate-500 uppercase">{c.vin}</td>
+                                   <td className="px-6 py-4 text-right font-mono">
+                                      <p className="text-white font-bold">{c.nextServiceKm.toLocaleString()} KM</p>
+                                      <p className="text-slate-500 text-xs mt-1">in {c.nextServiceDays} Days</p>
+                                   </td>
+                                   <td className="px-6 py-4 text-right font-mono text-slate-300">
+                                      {c.joinedDate || '-'}
+                                   </td>
+                                </tr>
+                             ))
+                          )}
                        </tbody>
                     </table>
                  </div>
@@ -1703,6 +1847,48 @@ export default function App() {
           {activeTab === 'tracking' && renderTracking()}
           {activeTab === 'history' && renderHistory()}
           {activeTab === 'booking' && renderBooking()}
+
+          {/* ข่าวสารจากศูนย์บริการแสดงให้ลูกค้าเห็น */}
+          {activeTab === 'tracking' && newsList.filter(n => n.active).length > 0 && (
+            <div className="max-w-3xl mx-auto w-full mt-8 space-y-4 animate-in fade-in slide-in-from-bottom-4">
+               <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2"><Megaphone className="text-blue-600"/> ข่าวสารและข้อเสนอพิเศษ</h3>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {newsList.filter(n => n.active).map(n => (
+                     <div key={n.id} className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/20 flex flex-col relative overflow-hidden group">
+                        {n.image ? (
+                            <div className="h-48 w-full relative overflow-hidden shrink-0">
+                                <img src={n.image} alt={n.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                                <div className="absolute bottom-4 left-4 right-4 flex items-center gap-2">
+                                    {n.type === 'promo' ? <Tag size={16} className="text-amber-400"/> : <Info size={16} className="text-blue-400"/>}
+                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase backdrop-blur-md ${n.type === 'promo' ? 'bg-amber-500/30 text-amber-100 border border-amber-400/30' : 'bg-blue-500/30 text-blue-100 border border-blue-400/30'}`}>
+                                        {n.type === 'promo' ? 'PROMOTION' : 'INFORMATION'}
+                                    </span>
+                                    <span className="text-[10px] text-white/80 ml-auto">{n.date}</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className={`absolute top-0 right-0 w-24 h-24 rounded-bl-full -z-10 opacity-20 ${n.type === 'promo' ? 'bg-amber-400' : 'bg-blue-400'}`}></div>
+                        )}
+                        
+                        <div className="p-5 flex-1">
+                           {!n.image && (
+                               <div className="flex items-center gap-2 mb-3">
+                                  {n.type === 'promo' ? <Tag size={16} className="text-amber-500"/> : <Info size={16} className="text-blue-500"/>}
+                                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${n.type === 'promo' ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600'}`}>
+                                      {n.type === 'promo' ? 'PROMOTION' : 'INFORMATION'}
+                                  </span>
+                                  <span className="text-[10px] text-slate-400 ml-auto bg-slate-50 px-2 py-0.5 rounded-full">{n.date}</span>
+                               </div>
+                           )}
+                           <h4 className="font-bold text-slate-800 mb-2 leading-tight">{n.title}</h4>
+                           <p className="text-sm text-slate-600 leading-relaxed">{n.content}</p>
+                        </div>
+                     </div>
+                  ))}
+               </div>
+            </div>
+          )}
         </div>
 
         <nav className="md:hidden absolute bottom-0 w-full bg-white border-t border-slate-200 px-6 py-3 flex justify-between items-center shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.05)] z-40 pb-safe">
