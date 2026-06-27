@@ -5,7 +5,7 @@ import {
   ShieldCheck, AlertCircle, CalendarDays, Star, LogOut,
   UserPlus, Bell, ChevronLeft, Info, Settings, ArrowRight,
   Eye, EyeOff, Cpu, BatteryCharging, Plus, Trash2,
-  Coffee, Zap, Activity, Check, Users
+  Coffee, Zap, Activity, Check, Users, History, Edit3, Save, X
 } from 'lucide-react';
 
 const INITIAL_SERVICE_STEPS = [
@@ -16,13 +16,12 @@ const INITIAL_SERVICE_STEPS = [
   { id: 5, title: 'พร้อมส่งมอบ', desc: 'รอให้ลูกค้ามารับรถ', icon: ShieldCheck },
 ];
 
-// เปลี่ยนจากค่าคงที่เป็น Initial Data เพื่อนำไปใส่ใน State ให้แก้ไขได้
-const INITIAL_TECHNICIANS = [
-  { id: 'tech1', username: 'tech1', password: '123', name: 'ช่างต้น', role: 'Senior Technician', rating: 4.9, expertise: 'ระบบไฟฟ้าและเครื่องยนต์', img: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=200&h=200' },
-  { id: 'tech2', username: 'tech2', password: '123', name: 'ช่างคิว', role: 'Diagnostic Specialist', rating: 4.8, expertise: 'วิเคราะห์ระบบคอมพิวเตอร์รถ', img: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=200&h=200' },
-  { id: 'tech3', username: 'tech3', password: '123', name: 'ช่างซ่า', role: 'Maintenance Expert', rating: 4.9, expertise: 'ช่วงล่างและระบบเบรก', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200&h=200' },
-  { id: 'tech4', username: 'tech4', password: '123', name: 'ช่างแม็ก', role: 'General Technician', rating: 4.7, expertise: 'ดูแลรักษาและซ่อมบำรุงทั่วไป', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200&h=200' },
-  { id: 'admin', username: 'admin', password: '123', name: 'คุณเพิร์ธ (Manager)', role: 'Service Manager', rating: 5.0, expertise: 'บริหารจัดการศูนย์บริการ', img: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&q=80&w=200&h=200' },
+const INITIAL_STAFF = [
+  { id: 'admin', username: 'admin', password: '123', name: 'คุณเพิร์ธ (Manager)', role: 'Service Manager', phone: '080-000-0000', lineId: '@perth_volvo', img: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=200&h=200' },
+  { id: 'tech1', username: 'tech1', password: '123', name: 'ช่างต้น', role: 'Senior Technician', phone: '081-111-1111', lineId: '@ton_volvo', img: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=200&h=200' },
+  { id: 'tech2', username: 'tech2', password: '123', name: 'ช่างคิว', role: 'Diagnostic Specialist', phone: '082-222-2222', lineId: '@q_volvo', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200&h=200' },
+  { id: 'tech3', username: 'tech3', password: '123', name: 'ช่างซ่า', role: 'Maintenance Expert', phone: '083-333-3333', lineId: '@za_volvo', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200&h=200' },
+  { id: 'tech4', username: 'tech4', password: '123', name: 'ช่างแม็ก', role: 'General Technician', phone: '084-444-4444', lineId: '@max_volvo', img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=200&h=200' },
 ];
 
 const CUSTOMER_DB = [
@@ -31,8 +30,12 @@ const CUSTOMER_DB = [
 ];
 
 const INITIAL_JOBS = [
-  { jobId: 'J001', customerId: 'c1', licensePlate: 'กท 9999', team: ['tech1', 'tech3'], currentStepId: 3, notes: [], specialStatus: null, totalEstimatedMinutes: 120, reqLounge: true, reqEV: true },
-  { jobId: 'J002', customerId: 'c2', licensePlate: 'ขต 5555', team: ['tech2'], currentStepId: 2, notes: [], specialStatus: null, totalEstimatedMinutes: 90, reqLounge: false, reqEV: true }
+  { jobId: 'J001', customerId: 'c1', licensePlate: 'กท 9999', team: ['tech1', 'tech3'], currentStepId: 3, notes: [], specialStatus: null, totalEstimatedMinutes: 120, reqLounge: true, reqEV: true, healthReport: { battery: '98%', software: '2.14', brake: 'สมบูรณ์', diagNote: 'พบรอยขีดข่วนกันชนหน้าเล็กน้อย ลูกค้ารับทราบแล้ว' } },
+  { jobId: 'J002', customerId: 'c2', licensePlate: 'ขต 5555', team: ['tech2', 'tech4'], currentStepId: 2, notes: [], specialStatus: null, totalEstimatedMinutes: 90, reqLounge: false, reqEV: true, healthReport: { battery: '100%', software: '2.12', brake: 'ปกติ', diagNote: '' } }
+];
+
+const INITIAL_HISTORY = [
+  { jobId: 'H001', customerId: 'c1', licensePlate: 'กท 9999', serviceName: 'เช็คระยะมาตรฐาน (10,000 km)', completedDate: '2025-11-20', totalMinutes: 65, team: ['tech1', 'tech3'], healthReport: { battery: '99%', software: '2.12', brake: 'สมบูรณ์', diagNote: 'ตรวจเช็คตามระยะเรียบร้อย' } },
 ];
 
 const INITIAL_SERVICES = [
@@ -46,7 +49,6 @@ const INITIAL_SERVICES = [
 const MOCK_BOOKINGS = [
   { id: 'b1', date: new Date().toISOString().split('T')[0], time: '10:00', licensePlate: 'ชจ 1122', customerName: 'คุณสมหญิง', phone: '082-123-4567', service: 'เช็คระยะชุดใหญ่ (20,000 km)', estimatedMinutes: 120, team: ['tech1', 'tech3'], reqLounge: true, reqEV: false },
   { id: 'b2', date: new Date().toISOString().split('T')[0], time: '14:00', licensePlate: 'ฮฮ 5555', customerName: 'คุณประเสริฐ', phone: '081-987-6543', service: 'เปลี่ยนถ่ายน้ำมันเครื่องและไส้กรอง', estimatedMinutes: 45, team: [], reqLounge: false, reqEV: false },
-  { id: 'b3', date: new Date(Date.now() + 86400000).toISOString().split('T')[0], time: '09:00', licensePlate: 'วว 9876', customerName: 'คุณมานี', phone: '089-111-2222', service: 'ตรวจเช็คช่วงล่างและระบบเบรก', estimatedMinutes: 90, team: [], reqLounge: true, reqEV: true }
 ];
 
 const getMonthKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
@@ -59,11 +61,11 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('tracking');
   const [staffTab, setStaffTab] = useState('active'); 
   
-  // State ฐานข้อมูลหลัก
-  const [technicians, setTechnicians] = useState(INITIAL_TECHNICIANS); // ระบบทีมช่างใหม่
+  const [staffList, setStaffList] = useState(INITIAL_STAFF);
   const [services, setServices] = useState(INITIAL_SERVICES);
   const [customers, setCustomers] = useState(CUSTOMER_DB);
   const [activeJobs, setActiveJobs] = useState(INITIAL_JOBS);
+  const [jobHistory, setJobHistory] = useState(INITIAL_HISTORY);
   const [bookings, setBookings] = useState(MOCK_BOOKINGS);
 
   const [loginEmail, setLoginEmail] = useState('');
@@ -88,7 +90,6 @@ export default function App() {
   const [staffSelectedDate, setStaffSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   
   const [pendingAlerts, setPendingAlerts] = useState([]);
-  const [showContactPST, setShowContactPST] = useState(false);
   
   const [pstMonthDate, setPstMonthDate] = useState(new Date());
   const [monthlyTeams, setMonthlyTeams] = useState({
@@ -99,11 +100,10 @@ export default function App() {
   });
 
   const [greeting, setGreeting] = useState('');
-  const [currentTime, setCurrentTime] = useState(new Date());
   const [progressAngle, setProgressAngle] = useState(0);
-
   const [newServiceName, setNewServiceName] = useState('');
   const [newServiceTime, setNewServiceTime] = useState(60);
+  const [showContactModal, setShowContactModal] = useState(false);
 
   useEffect(() => {
     if (authMode === 'app' && currentUser) {
@@ -126,7 +126,6 @@ export default function App() {
       }
     }
   }, [authMode, currentUser, activeJobs]);
-
 
   const handleCustomerLogin = (e) => {
     e.preventDefault();
@@ -151,13 +150,12 @@ export default function App() {
 
   const handleStaffLogin = (e) => {
     e.preventDefault();
-    // ดึงค่าการล็อกอินจาก State ที่แอดมินแก้ไขได้ (Dynamic Login)
-    const tech = technicians.find(t => t.username === staffLogin.username);
-    if (tech && tech.password === staffLogin.password) {
-      setCurrentStaff(tech);
+    const staff = staffList.find(t => t.username === staffLogin.username);
+    if (staff && staff.password === staffLogin.password) {
+      setCurrentStaff(staff);
       setAuthMode('staffDashboard');
     } else {
-      alert('Username หรือ Password ไม่ถูกต้อง');
+      setLoginError('รหัสพนักงาน หรือ รหัสผ่านไม่ถูกต้อง');
     }
   };
 
@@ -167,10 +165,7 @@ export default function App() {
     setAuthMode('welcome');
     setActiveTab('tracking');
     setStaffTab('active');
-  };
-
-  const handleUpdateNextService = (customerId, km, days) => {
-    setCustomers(prev => prev.map(c => c.id === customerId ? { ...c, nextServiceKm: km, nextServiceDays: days } : c));
+    setLoginError('');
   };
   
   const handleAddNote = (jobId, stepId, text) => {
@@ -178,6 +173,15 @@ export default function App() {
     const now = new Date();
     const timeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     setActiveJobs(jobs => jobs.map(j => j.jobId === jobId ? {...j, notes: [...(j.notes || []), {stepId, text, timestamp: timeString}]} : j));
+  };
+
+  const handleUpdateHealth = (jobId, field, value) => {
+    setActiveJobs(jobs => jobs.map(j => {
+      if(j.jobId === jobId) {
+         return { ...j, healthReport: { ...j.healthReport, [field]: value } };
+      }
+      return j;
+    }));
   };
 
   const handleStartBooking = (bookingId) => {
@@ -205,7 +209,8 @@ export default function App() {
       reqLounge: booking.reqLounge || false,
       reqEV: booking.reqEV || false,
       notes: [{stepId: 1, text: `ลูกค้านำรถมา Drop-off ล่วงหน้า (บริการ: ${booking.service})`, timestamp: timeString}],
-      specialStatus: null
+      specialStatus: null,
+      healthReport: { battery: 'กำลังตรวจสอบ', software: 'กำลังตรวจสอบ', brake: 'กำลังตรวจสอบ', diagNote: '' }
     };
 
     setActiveJobs(prev => [newJob, ...prev]);
@@ -306,59 +311,11 @@ export default function App() {
       );
     }
 
-    if (authMode === 'register') {
-      return (
-        <div className="min-h-screen bg-[#050B14] flex items-center justify-center p-6 relative">
-          <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 w-full max-w-2xl shadow-2xl border border-white/10 animate-in slide-in-from-bottom-8">
-            <button onClick={() => setAuthMode('welcome')} className="text-slate-400 hover:text-white mb-6 flex items-center gap-2 transition-colors">
-              <ChevronLeft size={20} /> กลับไปหน้าล็อกอิน
-            </button>
-            <h2 className="text-2xl font-bold text-white mb-6 tracking-wide">ลงทะเบียนข้อมูลลูกค้าใหม่</h2>
-            <form onSubmit={handleRegister} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1">ชื่อ-นามสกุล</label>
-                  <input type="text" required value={regForm.name} onChange={e => setRegForm({...regForm, name: e.target.value})} className="w-full p-3 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-blue-500" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1">อีเมล</label>
-                  <input type="email" required value={regForm.email} onChange={e => setRegForm({...regForm, email: e.target.value})} className="w-full p-3 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-blue-500" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1">เบอร์โทรศัพท์</label>
-                  <input type="tel" required value={regForm.phone} onChange={e => setRegForm({...regForm, phone: e.target.value})} className="w-full p-3 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-blue-500" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1">Line ID</label>
-                  <input type="text" value={regForm.lineId} onChange={e => setRegForm({...regForm, lineId: e.target.value})} className="w-full p-3 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-blue-500" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1">รุ่นรถยนต์</label>
-                  <input type="text" placeholder="เช่น XC60" required value={regForm.model} onChange={e => setRegForm({...regForm, model: e.target.value})} className="w-full p-3 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-blue-500" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1">ป้ายทะเบียน (ใช้เป็นรหัสผ่าน)</label>
-                  <input type="text" placeholder="เช่น กท 9999" required value={regForm.licensePlate} onChange={e => setRegForm({...regForm, licensePlate: e.target.value})} className="w-full p-3 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-blue-500" />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-slate-300 mb-1">เลขตัวถัง (VIN)</label>
-                  <input type="text" required value={regForm.vin} onChange={e => setRegForm({...regForm, vin: e.target.value})} className="w-full p-3 rounded-xl bg-white/5 border border-white/10 text-white outline-none uppercase focus:border-blue-500" />
-                </div>
-              </div>
-              <button type="submit" className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-500 transition-colors mt-6 shadow-[0_0_15px_rgba(37,99,235,0.4)]">
-                บันทึกข้อมูลและเข้าสู่ระบบ
-              </button>
-            </form>
-          </div>
-        </div>
-      );
-    }
-
     if (authMode === 'staffLogin') {
       return (
         <div className="min-h-screen bg-[#050B14] flex items-center justify-center p-6 relative">
           <div className="bg-slate-900/80 backdrop-blur-xl rounded-3xl p-8 w-full max-w-sm shadow-2xl border border-slate-700 animate-in slide-in-from-bottom-8">
-             <button onClick={() => setAuthMode('welcome')} className="text-slate-500 hover:text-white mb-6 flex items-center gap-2 transition-colors">
+             <button onClick={() => {setAuthMode('welcome'); setLoginError('');}} className="text-slate-500 hover:text-white mb-6 flex items-center gap-2 transition-colors">
               <ChevronLeft size={20} /> กลับ
             </button>
             <div className="flex justify-center mb-6">
@@ -368,8 +325,15 @@ export default function App() {
             </div>
             <h2 className="text-xl font-bold text-white text-center mb-6 tracking-widest">STAFF TERMINAL</h2>
             <form onSubmit={handleStaffLogin} className="space-y-4">
-              <input type="text" placeholder="Username (เช่น admin / tech1)" required value={staffLogin.username} onChange={e => setStaffLogin({...staffLogin, username: e.target.value})} className="w-full p-4 rounded-xl bg-slate-950 border border-slate-700 text-white focus:border-blue-500 outline-none" />
-              <input type="password" placeholder="Password" required value={staffLogin.password} onChange={e => setStaffLogin({...staffLogin, password: e.target.value})} className="w-full p-4 rounded-xl bg-slate-950 border border-slate-700 text-white focus:border-blue-500 outline-none" />
+              <input type="text" placeholder="Username (เช่น admin หรือ tech1)" required value={staffLogin.username} onChange={e => {setStaffLogin({...staffLogin, username: e.target.value}); setLoginError('');}} className="w-full p-4 rounded-xl bg-slate-950 border border-slate-700 text-white focus:border-blue-500 outline-none" />
+              <input type="password" placeholder="Password (รหัสผ่าน)" required value={staffLogin.password} onChange={e => {setStaffLogin({...staffLogin, password: e.target.value}); setLoginError('');}} className="w-full p-4 rounded-xl bg-slate-950 border border-slate-700 text-white focus:border-blue-500 outline-none" />
+              
+              {loginError && (
+                <div className="bg-red-500/20 border border-red-500/50 text-red-200 p-3 rounded-lg text-sm flex items-center gap-2">
+                  <AlertCircle size={16} /> {loginError}
+                </div>
+              )}
+
               <button type="submit" className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-500 transition-colors shadow-[0_0_15px_rgba(37,99,235,0.4)]">Access Terminal</button>
             </form>
           </div>
@@ -390,6 +354,7 @@ export default function App() {
           {[
             { id: 'tracking', label: 'สถานะบริการ', icon: Car },
             { id: 'booking', label: 'จองคิวล่วงหน้า', icon: CalendarDays },
+            { id: 'history', label: 'ประวัติซ่อมบำรุง', icon: History },
           ].map(item => (
             <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-4 px-4 py-4 rounded-2xl font-bold transition-all ${activeTab === item.id ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)]' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}>
               <item.icon size={24} className={activeTab === 'tracking' && item.id === 'tracking' ? 'animate-[pulse_2s_infinite]' : ''} />
@@ -400,8 +365,8 @@ export default function App() {
 
         <div className="p-4 bg-white/5 m-4 rounded-2xl border border-white/10 relative z-10 backdrop-blur-md">
            <p className="text-xs text-slate-400 mb-2">เข้าสู่ระบบในชื่อ</p>
-           <p className="font-bold truncate text-white">{currentUser.name}</p>
-           <p className="text-sm text-blue-400">{currentUser.licensePlate}</p>
+           <p className="font-bold truncate text-white">{currentUser?.name}</p>
+           <p className="text-sm text-blue-400">{currentUser?.licensePlate}</p>
            <button onClick={handleLogout} className="mt-4 w-full flex items-center justify-center gap-2 py-2 bg-red-500/10 rounded-xl text-sm font-semibold hover:bg-red-500/20 text-red-400 transition-colors">
              <LogOut size={16} /> ออกจากระบบ
            </button>
@@ -430,32 +395,60 @@ export default function App() {
       );
     }
 
-    const assignedTechs = myJob.team.map(id => technicians.find(t => t.id === id)).filter(Boolean);
-    
+    const assignedTechs = myJob.team.map(id => staffList.find(t => t.id === id)).filter(Boolean);
     const baseMinutes = myJob.totalEstimatedMinutes || 120;
     const remainingSteps = 5 - myJob.currentStepId;
     const estimatedMinutesLeft = Math.round((baseMinutes / 4) * remainingSteps);
     const estimatedTime = myJob.currentStepId < 5 ? `${estimatedMinutesLeft} นาที` : 'พร้อมรับรถ';
-    
     const progressPercent = (myJob.currentStepId / 5) * 100;
 
     return (
       <div className="max-w-3xl mx-auto w-full space-y-6 animate-in fade-in duration-500">
         
-        {/* Dynamic Header & Hologram Progress */}
+        {/* Contact Modal Popup */}
+        {showContactModal && (
+           <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+             <div className="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-full -z-10"></div>
+                <button onClick={() => setShowContactModal(false)} className="absolute top-4 right-4 p-2 bg-slate-50 hover:bg-slate-100 text-slate-400 rounded-full transition-colors"><X size={20}/></button>
+                
+                <h3 className="text-2xl font-bold text-slate-800 mb-1">ติดต่อทีมช่าง (PST)</h3>
+                <p className="text-slate-500 mb-6 text-sm">เลือกช่องทางที่สะดวกเพื่อสอบถามรายละเอียด</p>
+                
+                {assignedTechs.map(tech => (
+                  <div key={tech.id} className="bg-slate-50 p-4 rounded-2xl mb-3 border border-slate-100">
+                     <div className="flex items-center gap-4 mb-4">
+                        <img src={tech.img} className="w-12 h-12 rounded-full object-cover shadow-sm" />
+                        <div>
+                           <p className="font-bold text-slate-800">{tech.name}</p>
+                           <p className="text-xs text-blue-600 font-semibold">{tech.role}</p>
+                        </div>
+                     </div>
+                     <div className="grid grid-cols-2 gap-3">
+                        <a href={`tel:${tech.phone}`} className="flex items-center justify-center gap-2 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-sm transition-colors shadow-sm">
+                           <Phone size={16}/> โทรสายตรง
+                        </a>
+                        <a href={`https://line.me/R/ti/p/${tech.lineId}`} target="_blank" className="flex items-center justify-center gap-2 py-3 bg-emerald-500 hover:bg-emerald-400 text-white rounded-xl font-bold text-sm transition-colors shadow-sm">
+                           <MessageCircle size={16}/> LINE แชท
+                        </a>
+                     </div>
+                  </div>
+                ))}
+             </div>
+           </div>
+        )}
+
         <div className="bg-gradient-to-br from-[#050B14] to-blue-900 rounded-3xl p-6 md:p-8 shadow-2xl text-white relative overflow-hidden border border-blue-800/50">
            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-           
            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
               <div>
-                <p className="text-blue-300 font-medium mb-1">{greeting}</p>
+                <p className="text-blue-300 font-medium mb-1">สวัสดีครับคุณลูกค้า,</p>
                 <h2 className="text-3xl font-bold mb-1">{currentUser.model}</h2>
                 <p className="text-xl opacity-90 font-mono tracking-wider bg-white/10 inline-block px-3 py-1 rounded-lg border border-white/20">{currentUser.licensePlate}</p>
               </div>
               
               <div className="flex items-center gap-6 bg-black/30 p-4 rounded-2xl border border-white/10 backdrop-blur-md">
                  <div className="relative w-20 h-20 flex items-center justify-center">
-                    {/* SVG Hologram Ring */}
                     <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                       <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="6" />
                       <circle cx="50" cy="50" r="45" fill="none" stroke="#3b82f6" strokeWidth="6" strokeDasharray="283" strokeDashoffset={283 - (283 * progressAngle) / 360} className="transition-all duration-300 ease-out" strokeLinecap="round" />
@@ -472,29 +465,46 @@ export default function App() {
            </div>
         </div>
 
-        {/* Feature 2: Automated Vehicle Health Report (โชว์เมื่อเข้าถึงขั้นตอนที่ 2 ขึ้นไป) */}
-        {myJob.currentStepId >= 2 && (
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col md:flex-row gap-6 items-center animate-in slide-in-from-bottom-4">
-             <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shrink-0">
-                <Activity size={32} />
-             </div>
-             <div className="flex-1 w-full">
-                <h3 className="text-lg font-bold text-slate-800 mb-1">รายงานสุขภาพรถยนต์ (Auto-Check)</h3>
-                <p className="text-sm text-slate-500 mb-4">ระบบวิเคราะห์ข้อมูลจากตัวรถอัตโนมัติ</p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                   <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl flex items-center gap-3">
-                      <div className="bg-emerald-100 text-emerald-600 p-1.5 rounded-full"><Check size={14}/></div>
-                      <span className="text-xs font-bold text-slate-700">แบตเตอรี่ไฮบริด 98%</span>
-                   </div>
-                   <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl flex items-center gap-3">
-                      <div className="bg-emerald-100 text-emerald-600 p-1.5 rounded-full"><Check size={14}/></div>
-                      <span className="text-xs font-bold text-slate-700">ซอฟต์แวร์ล่าสุด 2.14</span>
-                   </div>
-                   <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl flex items-center gap-3">
-                      <div className="bg-emerald-100 text-emerald-600 p-1.5 rounded-full"><Check size={14}/></div>
-                      <span className="text-xs font-bold text-slate-700">ระบบเบรกสมบูรณ์</span>
-                   </div>
-                </div>
+        {myJob.currentStepId >= 2 && myJob.healthReport && (
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 animate-in slide-in-from-bottom-4 relative overflow-hidden">
+             <div className="absolute top-0 right-0 bg-blue-50 p-6 rounded-bl-full -z-10"></div>
+             <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
+                 <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center shrink-0">
+                    <Activity size={32} />
+                 </div>
+                 <div className="flex-1 w-full">
+                    <h3 className="text-lg font-bold text-slate-800 mb-1">รายงานอาการและสุขภาพรถ (Diagnosis)</h3>
+                    <p className="text-sm text-slate-500 mb-4">ข้อมูลสรุปจากทีมช่างเทคนิค</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                       <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl flex items-center gap-3">
+                          <div className="bg-blue-100 text-blue-600 p-1.5 rounded-full"><BatteryCharging size={14}/></div>
+                          <div>
+                            <p className="text-[10px] text-slate-400">แบตเตอรี่ไฮบริด</p>
+                            <span className="text-xs font-bold text-slate-700">{myJob.healthReport.battery}</span>
+                          </div>
+                       </div>
+                       <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl flex items-center gap-3">
+                          <div className="bg-emerald-100 text-emerald-600 p-1.5 rounded-full"><Cpu size={14}/></div>
+                          <div>
+                            <p className="text-[10px] text-slate-400">ระบบซอฟต์แวร์</p>
+                            <span className="text-xs font-bold text-slate-700">{myJob.healthReport.software}</span>
+                          </div>
+                       </div>
+                       <div className="bg-slate-50 border border-slate-100 p-3 rounded-xl flex items-center gap-3">
+                          <div className="bg-amber-100 text-amber-600 p-1.5 rounded-full"><Wrench size={14}/></div>
+                          <div>
+                            <p className="text-[10px] text-slate-400">ช่วงล่าง/เบรก</p>
+                            <span className="text-xs font-bold text-slate-700">{myJob.healthReport.brake}</span>
+                          </div>
+                       </div>
+                    </div>
+                    {myJob.healthReport.diagNote && (
+                       <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl">
+                          <p className="text-xs font-bold text-slate-600 flex items-center gap-1 mb-1"><Info size={12}/> ข้อความแจ้งอาการ / ปัญหาเบื้องต้น</p>
+                          <p className="text-sm text-slate-700">{myJob.healthReport.diagNote}</p>
+                       </div>
+                    )}
+                 </div>
              </div>
           </div>
         )}
@@ -509,7 +519,6 @@ export default function App() {
           </div>
         )}
 
-        {/* Handover Pass */}
         {myJob.currentStepId === 5 && !myJob.specialStatus && (
            <div className="bg-gradient-to-r from-amber-400 to-amber-600 p-1 rounded-3xl animate-[pulse_2s_infinite]">
               <div className="bg-[#050B14] p-8 rounded-[22px] flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
@@ -529,7 +538,7 @@ export default function App() {
            </div>
         )}
 
-        {/* Tracking Stepper */}
+        {/* Tracking Stepper Structure with precise line connections */}
         <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl border border-slate-100 relative overflow-hidden">
           <div className="flex justify-between items-center mb-8 relative z-10">
             <h2 className="text-xl font-bold text-slate-800">ขั้นตอนการบริการ</h2>
@@ -551,7 +560,6 @@ export default function App() {
                 return (
                   <div key={step.id} className={`relative flex items-start ${!isLast ? 'pb-8 md:pb-12' : ''} transition-all duration-500 ${isPending ? 'opacity-40 grayscale' : ''}`}>
                     
-                    {/* Vertical Line perfectly aligned between steps */}
                     {!isLast && (
                         <div className={`absolute left-[26px] md:left-[30px] top-14 md:top-16 bottom-0 w-1 transition-all duration-700 ${isCompleted ? 'bg-blue-500' : 'bg-slate-100'}`}>
                            {isCurrent && (
@@ -601,7 +609,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* PST Team Card */}
         {assignedTechs.length > 0 && (
           <div className="bg-white rounded-3xl p-6 shadow-xl border border-slate-100">
              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Personal Service Team (PST)</h3>
@@ -618,44 +625,76 @@ export default function App() {
                    <p className="font-bold text-slate-800">ทีมช่างเทคนิคคู่หู</p>
                    <p className="text-sm text-slate-500">{assignedTechs.map(t=>t.name).join(' & ')}</p>
                 </div>
-                <button onClick={() => setShowContactPST(true)} className="bg-[#050B14] text-white px-6 py-3 rounded-xl font-bold hover:bg-slate-800 transition-colors shadow-lg">
+                <button onClick={() => setShowContactModal(true)} className="bg-[#050B14] text-white px-6 py-3 rounded-xl font-bold hover:bg-slate-800 transition-colors shadow-lg">
                    ติดต่อทีมช่าง
                 </button>
              </div>
           </div>
         )}
+      </div>
+    );
+  };
 
-        {/* Contact PST Modal */}
-        {showContactPST && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#050B14]/60 backdrop-blur-sm animate-in fade-in duration-200">
-             <div className="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-                <div className="bg-blue-600 p-6 text-center text-white relative">
-                   <ShieldCheck size={40} className="mx-auto mb-3 text-blue-200" />
-                   <h3 className="text-xl font-bold">ติดต่อทีมช่าง PST</h3>
-                   <p className="text-blue-200 text-sm mt-1">พร้อมให้คำปรึกษาและดูแลรถของคุณ</p>
-                </div>
-                <div className="p-6 space-y-4">
-                   <button onClick={() => setShowContactPST(false)} className="w-full flex items-center gap-4 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 p-4 rounded-2xl transition-colors font-bold text-left shadow-sm">
-                      <div className="bg-emerald-500 text-white p-2 rounded-full shrink-0"><MessageCircle size={20} /></div>
-                      <div>
-                         <p>แชทผ่าน LINE</p>
-                         <p className="text-xs font-normal opacity-80 mt-0.5">ตอบกลับภายใน 5 นาที</p>
-                      </div>
-                   </button>
-                   <button onClick={() => setShowContactPST(false)} className="w-full flex items-center gap-4 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 p-4 rounded-2xl transition-colors font-bold text-left shadow-sm">
-                      <div className="bg-blue-600 text-white p-2 rounded-full shrink-0"><Phone size={20} /></div>
-                      <div>
-                         <p>โทรสายตรง (Direct Call)</p>
-                         <p className="text-xs font-normal opacity-80 mt-0.5">02-VOLVO-PST</p>
-                      </div>
-                   </button>
-                   <button onClick={() => setShowContactPST(false)} className="w-full py-3 mt-2 text-slate-500 font-bold hover:bg-slate-50 rounded-xl transition-colors border border-transparent hover:border-slate-200">
-                      ปิดหน้าต่าง
-                   </button>
-                </div>
-             </div>
+  const renderHistory = () => {
+    const myHistory = jobHistory.filter(j => j.customerId === currentUser.id);
+
+    return (
+      <div className="max-w-3xl mx-auto w-full space-y-6 animate-in fade-in duration-500">
+        <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl border border-slate-100 relative overflow-hidden">
+          <div className="flex justify-between items-center mb-6 relative z-10">
+            <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2"><History className="text-blue-600"/> ประวัติการเข้ารับบริการ</h2>
           </div>
-        )}
+          
+          {myHistory.length === 0 ? (
+             <div className="text-center py-10">
+                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+                   <Clock size={32}/>
+                </div>
+                <p className="text-slate-500">ยังไม่มีประวัติการเข้ารับบริการของรถคันนี้</p>
+             </div>
+          ) : (
+             <div className="space-y-4">
+                {myHistory.map((h, idx) => (
+                   <div key={idx} className="border border-slate-100 rounded-2xl p-5 hover:border-blue-200 hover:shadow-md transition-all bg-slate-50/50">
+                      <div className="flex justify-between items-start mb-3">
+                         <div>
+                            <span className="text-xs font-bold text-blue-600 bg-blue-100 px-2 py-1 rounded-md">ส่งมอบเมื่อ: {h.completedDate}</span>
+                            <h3 className="font-bold text-slate-800 text-lg mt-2">{h.serviceName}</h3>
+                         </div>
+                         <div className="bg-emerald-50 text-emerald-600 p-2 rounded-full">
+                            <CheckCircle2 size={20}/>
+                         </div>
+                      </div>
+                      
+                      {h.healthReport && (
+                         <div className="mt-4 border-t border-slate-100 pt-4">
+                            <div className="grid grid-cols-3 gap-2 mb-3">
+                                <div className="text-center">
+                                   <p className="text-[10px] text-slate-400">แบตเตอรี่</p>
+                                   <p className="text-xs font-bold text-slate-700">{h.healthReport.battery}</p>
+                                </div>
+                                <div className="text-center border-l border-slate-200">
+                                   <p className="text-[10px] text-slate-400">ซอฟต์แวร์</p>
+                                   <p className="text-xs font-bold text-slate-700">{h.healthReport.software}</p>
+                                </div>
+                                <div className="text-center border-l border-slate-200">
+                                   <p className="text-[10px] text-slate-400">ระบบเบรก</p>
+                                   <p className="text-xs font-bold text-slate-700">{h.healthReport.brake}</p>
+                                </div>
+                            </div>
+                            {h.healthReport.diagNote && (
+                               <div className="bg-slate-100 p-3 rounded-lg">
+                                  <p className="text-[10px] font-bold text-slate-500">บันทึกข้อความจากช่าง:</p>
+                                  <p className="text-xs text-slate-700 mt-1">{h.healthReport.diagNote}</p>
+                               </div>
+                            )}
+                         </div>
+                      )}
+                   </div>
+                ))}
+             </div>
+          )}
+        </div>
       </div>
     );
   };
@@ -704,7 +743,6 @@ export default function App() {
 
     return (
         <div className="max-w-4xl mx-auto w-full space-y-6 animate-in fade-in duration-300">
-           {/* Progress Indicator */}
            <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
               <div className="flex justify-between items-center px-4 md:px-12 relative">
                 <div className="absolute left-[10%] right-[10%] top-1/2 -translate-y-1/2 h-1 bg-slate-100 -z-10">
@@ -722,7 +760,6 @@ export default function App() {
 
            {bookingStep === 1 && (
                <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-100 space-y-6">
-                 
                  <div>
                     <h3 className="text-xl font-bold text-slate-800 flex items-center gap-3 mb-4"><Wrench className="text-blue-600" /> เลือกบริการที่ต้องการ</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
@@ -735,7 +772,6 @@ export default function App() {
                     </div>
                  </div>
 
-                 {/* Feature 1: Volvo Premium Extras */}
                  <div className="border-t border-slate-100 pt-6 mb-8">
                     <h3 className="text-xl font-bold text-slate-800 flex items-center gap-3 mb-4"><Star className="text-blue-600" /> บริการเสริม (ไม่มีค่าใช้จ่าย)</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -811,13 +847,13 @@ export default function App() {
                             <button key={team.id} onClick={() => setSelectedTechs(team.techs)} className={`p-4 rounded-2xl border-2 text-left transition-all ${selectedTechs.join(',') === team.techs.join(',') ? 'border-blue-600 shadow-lg ring-4 ring-blue-50 bg-blue-50/20' : 'border-slate-100 hover:border-blue-200'}`}>
                                <div className="flex -space-x-4 mb-4">
                                   {team.techs.map(techId => {
-                                      const t = technicians.find(x => x.id === techId);
+                                      const t = staffList.find(x => x.id === techId);
                                       if(!t) return null;
                                       return <img key={t.id} src={t.img} className="w-16 h-16 rounded-full border-4 border-white shadow-sm relative object-cover" />
                                   })}
                                </div>
                                <h4 className="font-bold text-slate-800 text-lg">{team.name}</h4>
-                               <p className="text-sm text-slate-500">{team.techs.map(id => technicians.find(t=>t.id===id)?.name).join(' & ')}</p>
+                               <p className="text-sm text-slate-500">{team.techs.map(id => staffList.find(t=>t.id===id)?.name).join(' & ')}</p>
                             </button>
                         ))
                     )}
@@ -889,8 +925,6 @@ export default function App() {
   const renderStaffDashboard = () => {
     return (
       <div className="flex h-screen bg-[#020617] text-slate-300 font-sans">
-        
-        {/* Staff Sidebar */}
         <div className="w-64 bg-[#050B14] border-r border-slate-800 flex flex-col p-6">
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-white tracking-widest flex items-center gap-2">
@@ -917,6 +951,9 @@ export default function App() {
                </div>
                {pendingAlerts.length > 0 && <span className="bg-blue-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse shadow-[0_0_10px_rgba(59,130,246,0.5)]">{pendingAlerts.length} NEW</span>}
             </button>
+            <button onClick={() => setStaffTab('history')} className={`w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors ${staffTab === 'history' ? 'bg-blue-900/40 text-blue-400 border border-blue-900' : 'hover:bg-slate-900'}`}>
+               <History size={18} /> SERVICE_HISTORY
+            </button>
             {currentStaff.id === 'admin' && (
               <>
                 <button onClick={() => setStaffTab('crm')} className={`w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors ${staffTab === 'crm' ? 'bg-blue-900/40 text-blue-400 border border-blue-900' : 'hover:bg-slate-900'}`}>
@@ -928,7 +965,7 @@ export default function App() {
                 <button onClick={() => setStaffTab('services')} className={`w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors ${staffTab === 'services' ? 'bg-blue-900/40 text-blue-400 border border-blue-900' : 'hover:bg-slate-900'}`}>
                    <Clock size={18} /> SERVICE_CONFIG
                 </button>
-                <button onClick={() => setStaffTab('staffs')} className={`w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors ${staffTab === 'staffs' ? 'bg-blue-900/40 text-blue-400 border border-blue-900' : 'hover:bg-slate-900'}`}>
+                <button onClick={() => setStaffTab('staff')} className={`w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors mt-8 border ${staffTab === 'staff' ? 'bg-emerald-900/40 text-emerald-400 border-emerald-900' : 'border-slate-800 hover:bg-slate-900'}`}>
                    <User size={18} /> STAFF_ACCESS
                 </button>
               </>
@@ -983,8 +1020,8 @@ export default function App() {
                                 <div>
                                   <div className="flex gap-2 mb-3">
                                       <span className="bg-blue-900/30 border border-blue-900 text-blue-400 text-[10px] font-bold px-2 py-1 rounded font-mono inline-block">PROCESS: {job.jobId}</span>
-                                      {job.reqLounge && <span className="bg-amber-900/30 border border-amber-900 text-amber-400 text-[10px] font-bold px-2 py-1 rounded font-mono flex items-center gap-1" title="ลูกค้าจองพื้นที่ Lounge"><Coffee size={12}/> VIP_LOUNGE</span>}
-                                      {job.reqEV && <span className="bg-emerald-900/30 border border-emerald-900 text-emerald-400 text-[10px] font-bold px-2 py-1 rounded font-mono flex items-center gap-1" title="ลูกค้าขอชาร์จ EV"><Zap size={12}/> EV_CHARGE</span>}
+                                      {job.reqLounge && <span className="bg-amber-900/30 border border-amber-900 text-amber-400 text-[10px] font-bold px-2 py-1 rounded font-mono flex items-center gap-1"><Coffee size={12}/> VIP_LOUNGE</span>}
+                                      {job.reqEV && <span className="bg-emerald-900/30 border border-emerald-900 text-emerald-400 text-[10px] font-bold px-2 py-1 rounded font-mono flex items-center gap-1"><Zap size={12}/> EV_CHARGE</span>}
                                   </div>
                                   {job.specialStatus && (
                                     <span className="bg-red-900/30 border border-red-900 text-red-400 text-[10px] font-bold px-2 py-1 rounded font-mono mb-3 inline-flex items-center gap-1 animate-pulse">
@@ -1016,7 +1053,13 @@ export default function App() {
                                          ADVANCE_STEP <ArrowRight size={16} />
                                        </button>
                                    ) : (
-                                       <button onClick={() => setActiveJobs(jobs => jobs.map(j => j.jobId === job.jobId ? {...j, currentStepId: 1, notes: [], specialStatus: null} : j))} 
+                                       <button onClick={() => {
+                                            const completedDate = new Date().toISOString().split('T')[0];
+                                            const srvName = services.find(s => s.estimatedMinutes === job.totalEstimatedMinutes)?.name || 'บริการซ่อมบำรุงทั่วไป';
+                                            const historyRecord = { ...job, serviceName: srvName, completedDate };
+                                            setJobHistory(prev => [historyRecord, ...prev]);
+                                            setActiveJobs(jobs => jobs.filter(j => j.jobId !== job.jobId));
+                                       }} 
                                                className="flex-1 bg-emerald-600/80 hover:bg-emerald-500 text-white py-3 rounded-lg font-bold transition-colors font-mono text-sm border border-emerald-500 flex justify-center items-center gap-2">
                                          HANDOVER_COMPLETE <CheckCircle2 size={16} />
                                        </button>
@@ -1036,6 +1079,31 @@ export default function App() {
                                 </div>
                               </div>
 
+                              {/* Real-time Vehicle Diagnosis Editor */}
+                              {job.currentStepId >= 2 && job.healthReport && (
+                                <div className="bg-emerald-900/20 p-4 rounded-xl border border-emerald-900/50 mb-6 relative z-10">
+                                   <p className="text-[10px] text-emerald-500 font-mono mb-3">VEHICLE_DIAGNOSIS (LIVE UPDATE TO CUSTOMER)</p>
+                                   <div className="grid grid-cols-3 gap-2 mb-3">
+                                      <div>
+                                        <p className="text-[10px] text-slate-500 font-mono mb-1">BATT_%</p>
+                                        <input type="text" value={job.healthReport.battery} onChange={(e) => handleUpdateHealth(job.jobId, 'battery', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white font-mono outline-none focus:border-emerald-500" />
+                                      </div>
+                                      <div>
+                                        <p className="text-[10px] text-slate-500 font-mono mb-1">SOFTWARE_VER</p>
+                                        <input type="text" value={job.healthReport.software} onChange={(e) => handleUpdateHealth(job.jobId, 'software', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white font-mono outline-none focus:border-emerald-500" />
+                                      </div>
+                                      <div>
+                                        <p className="text-[10px] text-slate-500 font-mono mb-1">BRAKE_SYS</p>
+                                        <input type="text" value={job.healthReport.brake} onChange={(e) => handleUpdateHealth(job.jobId, 'brake', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white font-mono outline-none focus:border-emerald-500" />
+                                      </div>
+                                   </div>
+                                   <div>
+                                     <p className="text-[10px] text-slate-500 font-mono mb-1">DIAGNOSIS_NOTE (ข้อความแจ้งอาการ)</p>
+                                     <input type="text" placeholder="ระบุอาการปัญหาเบื้องต้นให้ลูกค้าทราบ..." value={job.healthReport.diagNote} onChange={(e) => handleUpdateHealth(job.jobId, 'diagNote', e.target.value)} className="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-xs text-white font-mono outline-none focus:border-emerald-500" />
+                                   </div>
+                                </div>
+                              )}
+
                               <div className="mt-auto relative z-10 border-t border-slate-800 pt-5">
                                  {job.notes && job.notes.length > 0 && (
                                     <div className="mb-4 max-h-32 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
@@ -1048,12 +1116,6 @@ export default function App() {
                                     </div>
                                  )}
                                  
-                                 <p className="text-[10px] font-mono text-slate-500 mb-2">QUICK_REPLIES</p>
-                                 <div className="flex flex-wrap gap-2 mb-4">
-                                     <button type="button" onClick={() => handleAddNote(job.jobId, job.currentStepId, 'ตรวจสอบระบบคอมพิวเตอร์ด้วย VIDA สมบูรณ์ปกติครับ')} className="text-[10px] font-mono bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800 px-3 py-1.5 rounded border border-slate-700 transition-colors flex items-center gap-1"><Cpu size={12}/> VIDA_SCAN_OK</button>
-                                     <button type="button" onClick={() => handleAddNote(job.jobId, job.currentStepId, 'ระบบไฮบริดและแบตเตอรี่อยู่ในสภาพสมบูรณ์')} className="text-[10px] font-mono bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800 px-3 py-1.5 rounded border border-slate-700 transition-colors flex items-center gap-1"><BatteryCharging size={12}/> BATT_OK</button>
-                                 </div>
-                                 
                                  <form onSubmit={(e) => { e.preventDefault(); handleAddNote(job.jobId, job.currentStepId, e.target.note.value); e.target.reset(); }} className="flex gap-2">
                                      <input name="note" type="text" placeholder="TRANSMIT_MESSAGE..." className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-mono placeholder-slate-600 focus:border-blue-500 outline-none" />
                                      <button type="submit" className="bg-slate-800 text-slate-300 px-4 rounded-lg font-mono text-xs hover:bg-slate-700 hover:text-white transition-colors border border-slate-700">SEND</button>
@@ -1062,6 +1124,58 @@ export default function App() {
                           </div>
                         );
                     })}
+                 </div>
+              </div>
+           )}
+
+           {staffTab === 'history' && (
+              <div className="max-w-6xl mx-auto space-y-6">
+                 <div className="flex justify-between items-end mb-8 border-b border-slate-800 pb-4">
+                    <div>
+                      <h1 className="text-3xl font-bold text-white tracking-wide">SERVICE_HISTORY</h1>
+                      <p className="text-slate-500 font-mono mt-2">ประวัติงานซ่อมบำรุงและส่งมอบรถยนต์เรียบร้อยแล้ว ({jobHistory.length} RECORDS)</p>
+                    </div>
+                 </div>
+                 <div className="bg-[#050B14] rounded-2xl border border-slate-800 shadow-2xl overflow-x-auto">
+                    <table className="w-full text-left text-sm text-slate-400 whitespace-nowrap">
+                       <thead className="bg-slate-900 text-xs uppercase font-mono text-slate-500">
+                          <tr>
+                             <th className="px-6 py-5">Job ID / วันที่ส่งมอบ</th>
+                             <th className="px-6 py-5">ทะเบียน / ลูกค้า</th>
+                             <th className="px-6 py-5">บริการที่รับ</th>
+                             <th className="px-6 py-5">ช่างผู้ดูแล (PST)</th>
+                          </tr>
+                       </thead>
+                       <tbody className="divide-y divide-slate-800">
+                          {jobHistory.map(h => {
+                              const customer = customers.find(c => c.id === h.customerId);
+                              return (
+                                 <tr key={h.jobId} className="hover:bg-slate-900/50 transition-colors">
+                                    <td className="px-6 py-4 font-mono">
+                                       <p className="text-emerald-400 font-bold">{h.jobId}</p>
+                                       <p className="text-slate-500 text-xs mt-1">{h.completedDate}</p>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                       <p className="text-white font-bold">{h.licensePlate}</p>
+                                       <p className="text-slate-500 text-xs mt-1">{customer?.name}</p>
+                                    </td>
+                                    <td className="px-6 py-4 text-xs text-blue-300">
+                                       {h.serviceName}
+                                    </td>
+                                    <td className="px-6 py-4">
+                                       <div className="flex -space-x-2">
+                                          {h.team.map(techId => {
+                                              const t = staffList.find(x => x.id === techId);
+                                              if(!t) return null;
+                                              return <img key={t.id} src={t.img} title={t.name} className="w-8 h-8 rounded-full border-2 border-slate-800 object-cover relative" />
+                                          })}
+                                       </div>
+                                    </td>
+                                 </tr>
+                              )
+                          })}
+                       </tbody>
+                    </table>
                  </div>
               </div>
            )}
@@ -1111,7 +1225,6 @@ export default function App() {
                                      <p className="text-[10px] text-slate-500 font-mono mb-2">{b.phone}</p>
                                      <p className="text-xs text-emerald-400 bg-emerald-900/20 px-2 py-1 rounded inline-block w-fit mb-3">{b.service}</p>
                                      
-                                     {/* แสดงความต้องการพิเศษ */}
                                      {(b.reqLounge || b.reqEV) && (
                                         <div className="flex gap-2 mb-3">
                                           {b.reqLounge && <span className="text-[10px] bg-amber-900/30 text-amber-400 px-2 py-0.5 rounded flex items-center gap-1 border border-amber-900/50"><Coffee size={10}/> LOUNGE</span>}
@@ -1200,7 +1313,6 @@ export default function App() {
                                 <button 
                                    onClick={() => setServices(prev => prev.filter(s => s.id !== service.id))}
                                    className="p-3 text-slate-600 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-colors"
-                                   title="Delete Program"
                                 >
                                    <Trash2 size={18} />
                                 </button>
@@ -1306,7 +1418,7 @@ export default function App() {
                                      }} className="text-slate-600 hover:text-red-400"><Trash2 size={16}/></button>
                                   </div>
                                   <div className="flex flex-wrap gap-2">
-                                     {technicians.map(tech => {
+                                     {staffList.filter(s => s.id !== 'admin').map(tech => {
                                          const isAssigned = team.techs.includes(tech.id);
                                          return (
                                              <button key={tech.id} onClick={() => {
@@ -1361,7 +1473,7 @@ export default function App() {
                                      )}
                                  </div>
                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    {technicians.map(tech => {
+                                    {staffList.filter(s => s.id !== 'admin').map(tech => {
                                        const isAssigned = job.team.includes(tech.id);
                                        return (
                                           <button 
@@ -1399,49 +1511,62 @@ export default function App() {
               );
            })()}
 
-           {/* ฟีเจอร์ใหม่: STAFF ACCESS CONTROL (เฉพาะแอดมิน) */}
-           {staffTab === 'staffs' && (
-              <div className="max-w-4xl mx-auto space-y-6">
+           {staffTab === 'staff' && (
+              <div className="max-w-6xl mx-auto space-y-6">
                  <div className="flex justify-between items-end mb-8 border-b border-slate-800 pb-4">
                     <div>
                       <h1 className="text-3xl font-bold text-white tracking-wide">STAFF ACCESS CONTROL</h1>
-                      <p className="text-slate-500 font-mono mt-2">จัดการรหัสเข้าใช้งานของทีมช่าง (เฉพาะ Service Manager)</p>
+                      <p className="text-slate-500 font-mono mt-2">จัดการบัญชีผู้ใช้งาน สิทธิ์การเข้าถึง และข้อมูลการติดต่อทีมช่าง</p>
                     </div>
+                    <button onClick={() => {
+                        const newId = `tech${Date.now()}`;
+                        setStaffList(prev => [{id: newId, username: `user_${Math.floor(Math.random()*1000)}`, password: '123', name: 'พนักงานใหม่', role: 'Technician', phone: '-', lineId: '-', img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200&h=200'}, ...prev]);
+                    }} className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-bold transition-colors flex items-center gap-2 text-sm shadow-lg shadow-blue-500/20">
+                       <Plus size={16}/> ADD_STAFF
+                    </button>
                  </div>
-                 <div className="bg-[#050B14] rounded-2xl p-6 border border-slate-800 shadow-2xl">
-                    <div className="space-y-4">
-                       {technicians.map(tech => (
-                          <div key={tech.id} className="flex flex-col md:flex-row justify-between md:items-center gap-4 bg-slate-900/80 p-5 rounded-xl border border-slate-800 hover:border-blue-900 transition-colors">
-                             <div className="flex items-center gap-4">
-                                <img src={tech.img} className="w-12 h-12 rounded-full object-cover grayscale opacity-80" />
-                                <div>
-                                   <p className="font-bold text-white text-lg">{tech.name}</p>
-                                   <p className="text-xs text-slate-500 font-mono mt-1">ROLE: {tech.role}</p>
-                                </div>
-                             </div>
-                             <div className="flex items-center gap-4">
-                                <div className="flex flex-col gap-1">
-                                   <label className="text-[10px] text-slate-500 font-mono">USERNAME</label>
-                                   <input 
-                                     type="text" 
-                                     value={tech.username}
-                                     onChange={(e) => setTechnicians(prev => prev.map(t => t.id === tech.id ? {...t, username: e.target.value} : t))}
-                                     className="w-32 bg-slate-950 border border-blue-900/50 text-blue-400 font-bold font-mono p-2 rounded-md focus:border-blue-500 outline-none"
-                                   />
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                   <label className="text-[10px] text-slate-500 font-mono">PASSWORD</label>
-                                   <input 
-                                     type="text" 
-                                     value={tech.password}
-                                     onChange={(e) => setTechnicians(prev => prev.map(t => t.id === tech.id ? {...t, password: e.target.value} : t))}
-                                     className="w-32 bg-slate-950 border border-amber-900/50 text-amber-400 font-bold font-mono p-2 rounded-md focus:border-amber-500 outline-none"
-                                   />
-                                </div>
+
+                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {staffList.map(staff => (
+                       <div key={staff.id} className={`bg-slate-900 rounded-2xl border ${staff.id === 'admin' ? 'border-amber-500/50' : 'border-slate-800'} p-6 relative`}>
+                          {staff.id !== 'admin' && (
+                              <button onClick={() => setStaffList(prev => prev.filter(s => s.id !== staff.id))} className="absolute top-4 right-4 text-slate-600 hover:text-red-400 transition-colors">
+                                 <Trash2 size={18}/>
+                              </button>
+                          )}
+                          <div className="flex gap-4 items-center mb-6">
+                             <img src={staff.img} className="w-16 h-16 rounded-full object-cover border-2 border-slate-700" />
+                             <div className="flex-1">
+                                <input type="text" value={staff.name} onChange={(e) => setStaffList(prev => prev.map(s => s.id === staff.id ? {...s, name: e.target.value} : s))} className="bg-transparent text-white font-bold text-lg outline-none border-b border-dashed border-slate-700 focus:border-blue-500 w-full mb-1" />
+                                <input type="text" value={staff.role} onChange={(e) => setStaffList(prev => prev.map(s => s.id === staff.id ? {...s, role: e.target.value} : s))} className="bg-transparent text-blue-400 text-xs font-mono outline-none border-b border-dashed border-slate-700 focus:border-blue-500 w-full" />
                              </div>
                           </div>
-                       ))}
-                    </div>
+                          <div className="space-y-3 font-mono text-sm">
+                             <div className="flex flex-col gap-1">
+                                <label className="text-[10px] text-slate-500">USERNAME (รหัสเข้าสู่ระบบ)</label>
+                                <input type="text" value={staff.username} onChange={(e) => setStaffList(prev => prev.map(s => s.id === staff.id ? {...s, username: e.target.value} : s))} className="bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-300 focus:border-blue-500 outline-none" />
+                             </div>
+                             <div className="flex flex-col gap-1">
+                                <label className="text-[10px] text-slate-500">PASSWORD (รหัสผ่าน)</label>
+                                <input type="text" value={staff.password} onChange={(e) => setStaffList(prev => prev.map(s => s.id === staff.id ? {...s, password: e.target.value} : s))} className="bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-300 focus:border-blue-500 outline-none" />
+                             </div>
+                             <div className="flex gap-3 pt-2">
+                                <div className="flex-1 flex flex-col gap-1">
+                                   <label className="text-[10px] text-slate-500 flex items-center gap-1"><Phone size={10}/> PHONE</label>
+                                   <input type="text" value={staff.phone} onChange={(e) => setStaffList(prev => prev.map(s => s.id === staff.id ? {...s, phone: e.target.value} : s))} className="bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-300 focus:border-blue-500 outline-none w-full" />
+                                </div>
+                                <div className="flex-1 flex flex-col gap-1">
+                                   <label className="text-[10px] text-slate-500 flex items-center gap-1"><MessageCircle size={10}/> LINE_ID</label>
+                                   <input type="text" value={staff.lineId} onChange={(e) => setStaffList(prev => prev.map(s => s.id === staff.id ? {...s, lineId: e.target.value} : s))} className="bg-slate-950 border border-slate-700 rounded-lg p-2 text-emerald-400 focus:border-emerald-500 outline-none w-full" />
+                                </div>
+                             </div>
+                             <div className="flex flex-col gap-1 pt-2">
+                                <label className="text-[10px] text-slate-500">PROFILE_IMAGE_URL</label>
+                                <input type="text" value={staff.img} onChange={(e) => setStaffList(prev => prev.map(s => s.id === staff.id ? {...s, img: e.target.value} : s))} className="bg-slate-950 border border-slate-700 rounded-lg p-2 text-[10px] text-slate-400 focus:border-blue-500 outline-none" />
+                             </div>
+                          </div>
+                       </div>
+                    ))}
                  </div>
               </div>
            )}
@@ -1475,6 +1600,7 @@ export default function App() {
 
         <div className="flex-1 overflow-y-auto p-4 md:p-8 relative scroll-smooth pb-24 md:pb-8">
           {activeTab === 'tracking' && renderTracking()}
+          {activeTab === 'history' && renderHistory()}
           {activeTab === 'booking' && renderBooking()}
         </div>
 
@@ -1488,9 +1614,9 @@ export default function App() {
               <CalendarIcon size={24} />
             </button>
           </div>
-          <button className="flex flex-col items-center p-2 transition-colors text-slate-400 opacity-50 cursor-not-allowed">
-            <Bell size={24} />
-            <span className="text-[10px] font-bold mt-1">แจ้งเตือน</span>
+          <button onClick={() => setActiveTab('history')} className={`flex flex-col items-center p-2 transition-colors ${activeTab === 'history' ? 'text-blue-600' : 'text-slate-400'}`}>
+            <History size={24} className={activeTab === 'history' ? 'animate-[pulse_2s_infinite]' : ''} />
+            <span className="text-[10px] font-bold mt-1">ประวัติซ่อม</span>
           </button>
         </nav>
       </main>
